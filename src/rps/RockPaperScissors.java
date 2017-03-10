@@ -27,6 +27,7 @@ public class RockPaperScissors implements Runnable{
 
 	Scanner scanner = new Scanner(System.in);
 
+	private String name;
 	private String ip;
 	private int port;
 	private Socket socket;
@@ -44,6 +45,9 @@ public class RockPaperScissors implements Runnable{
 	private byte hand = 0;
 	private byte enemyhand = 0;
 
+	private boolean restart = false;
+	private boolean enemyrestart = false;
+	
 	private boolean win = false;
 	private boolean enemywin = false;
 	private boolean tie = false;
@@ -104,6 +108,7 @@ public class RockPaperScissors implements Runnable{
 			dis = new DataInputStream(socket.getInputStream());
 			accepted = true;
 			System.out.println("The client has connected to the server.");
+			name = "Client";
 		} catch(IOException e){
 			System.out.println("The client has not connected to the server.");
 			e.printStackTrace();
@@ -115,6 +120,7 @@ public class RockPaperScissors implements Runnable{
 		try{
 			serversocket = new ServerSocket(port,10,InetAddress.getByName(ip));
 			System.out.println("This thread has made the server.");
+			name = "Server";
 		} catch(IOException e){
 			e.printStackTrace();
 		}
@@ -155,20 +161,38 @@ public class RockPaperScissors implements Runnable{
 			if(!accepted)
 				waitingForCilent();
 			play();
+			restarting();
 		}
 	}
-
-	private void play(){
-		if(!gameover){
-			if(enemyhand == 0){
+	private void restarting(){
+		if(gameover){
+			if(!enemyrestart){
 				try{
-					enemyhand = dis.readByte();
-					System.out.println("DATA WAS RECIEVED");
+					enemyrestart = dis.readBoolean();
+					System.out.println(name + "DATA 2 WAS RECIEVED");
 				}
 				catch(IOException e){
 					e.printStackTrace();
 				}
 			}
+			if(restart && enemyrestart){
+				reset();
+			}
+		}
+	}
+	private void play(){
+		if(!gameover){
+			if(enemyhand == 0){
+				try{
+					enemyhand = dis.readByte();
+					System.out.println(name + "DATA WAS RECIEVED");
+				}
+				catch(IOException e){
+					e.printStackTrace();
+				}
+			}
+			System.out.println(name+hand);
+			System.out.println(name+enemyhand);
 			if(hand != 0 && enemyhand != 0)
 				checkForWin();
 		}
@@ -194,6 +218,9 @@ public class RockPaperScissors implements Runnable{
 		win = false;
 		enemywin = false;
 		gameover = false;
+		restart = false;
+		enemyrestart = false;
+		painter.repaint();
 	}
 	
 	private class Painter extends JPanel implements MouseListener{
@@ -214,7 +241,18 @@ public class RockPaperScissors implements Runnable{
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			// TODO Auto-generated method stub
-			if(accepted && hand == 0 && e.getY()>100 && e.getY()<450){
+			if(accepted && gameover){
+				restart = true;
+				try{
+					dos.writeBoolean(restart);
+					dos.flush();
+				}
+				catch(IOException ioe){
+					ioe.printStackTrace();
+				}
+				System.out.println("Data 2 was sent.");
+			}
+			if(accepted && !gameover && hand == 0 && e.getY()>100 && e.getY()<450){
 				
 				hand = (byte)((e.getX()/350)+1);
 				//System.out.println(hand);
@@ -227,7 +265,7 @@ public class RockPaperScissors implements Runnable{
 				catch(IOException ioe){
 					ioe.printStackTrace();
 				}
-				System.out.println("Data was sent.");
+				System.out.println(name + "Data was sent.");
 			}
 		}
 
@@ -278,11 +316,13 @@ public class RockPaperScissors implements Runnable{
 			else{
 				g.drawString("Winner has been found.",100,100);
 				if(win)
-				g.drawString("You win", 200, 100);
+				g.drawString("You win", 100, 150);
 				if(enemywin)
-					g.drawString("Enemy win", 200, 100);
+					g.drawString("Enemy win", 100, 150);
 				if(tie)
-					g.drawString("It is a tie", 200, 100);
+					g.drawString("It is a tie", 100, 150);
+				g.drawRect(100, 200, 5, 5);
+				g.drawString("Restart?", 100, 200);
 			}
 		}
 	}
