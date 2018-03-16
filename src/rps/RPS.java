@@ -14,9 +14,9 @@ public class RPS{
 	public boolean restarting = true;
 	
 	public Game game;
-	public final byte ROCK = 0;
-	public final byte PAPER = 1;
-	public final byte SCISSOR = 2;
+	private final byte ROCK = 0;
+	private final byte PAPER = 1;
+	private final byte SCISSOR = 2;
 	public final byte NOTHING = Byte.MIN_VALUE;
 	
 	private Server server = null;
@@ -27,7 +27,7 @@ public class RPS{
 	
 	private GUI gui = null;
 	
-	public RPS(){
+	RPS(){
 		//inputtingIPPort();
 		decideIfServer();
 		game = new Game();
@@ -44,14 +44,14 @@ public class RPS{
 //		}
 //	}
 	
-	public void decideIfServer(){
+	private void decideIfServer(){
 		client = new Client();
 		accepted = client.connectToServer(ip,port);
 		if(!accepted){
 			client = null;
 			server = new Server(ip,port);
 			accepted = server.waitingForCilent();
-		};
+		}
 	}
 	
 	private byte interpretString(String string){
@@ -64,19 +64,15 @@ public class RPS{
 		if(string.equals("s")){
 			return SCISSOR;
 		}
-		return NOTHING;
+		throw new RuntimeException("Unable to interpret string");
 	}
 	public String interpretByte(byte bit){
-		if(bit == PAPER){
-			return "PAPER";
+		switch(bit){
+			case PAPER: return "PAPER";
+			case SCISSOR: return "SCISSOR";
+			case ROCK: return "ROCK";
+			default: throw new RuntimeException("Unable to interpret byte");
 		}
-		if(bit == SCISSOR){
-			return "SCISSOR";
-		}
-		if(bit == ROCK){
-			return "ROCK";
-		}
-		return "IDK";
 	}
 	public void playYourHand(){
 		System.out.println(game.getYourHand());
@@ -98,6 +94,7 @@ public class RPS{
 			System.out.println("They have selected: "+interpretByte(game.getTheirHand()));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			System.err.println("Unable to read byte from input.");
 			e.printStackTrace();
 		}
 		System.out.println("You "+game.getResult());
@@ -113,10 +110,11 @@ public class RPS{
 		try {
 			output.writeBoolean(restarting);
 			System.out.println("Waiting for your opponent to respond...");
-			if(input.readBoolean() == false)
+			if(input.readBoolean())
 				restarting = false;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			System.err.println("Unable to write restarting to boolean");
 			e.printStackTrace();
 			restarting = false;
 		}

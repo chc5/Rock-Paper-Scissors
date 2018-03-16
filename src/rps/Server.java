@@ -14,11 +14,12 @@ public class Server {
 	
 	//private GUI gui;
 	final String name = "SERVER";
-	public Server(final String ip, final int port){
+	Server(final String ip, final int port){
 		try{
 			serverSocket = new ServerSocket(port,10,InetAddress.getByName(ip));
 			System.out.println("This thread has made the server.");
 		} catch(IOException e){
+			System.err.println("Failed to make the server.");
 			e.printStackTrace();
 		}
 	}
@@ -29,6 +30,7 @@ public class Server {
 			RPS.input = new DataInputStream(socket.getInputStream());
 			System.out.println("Server has accepted the cilent's request to join. Proceeding to play the game.");
 		} catch(IOException e){
+			System.err.println("Server has failed to accept cilent's request or have not seen the request.");
 			e.printStackTrace();
 			return false;
 		}

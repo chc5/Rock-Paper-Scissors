@@ -14,7 +14,7 @@ public class Game{
 	
 	private byte yourHand;
 	private byte theirHand;
-	public Game(){
+	Game(){
 		yourHand = NOTHING;
 		theirHand = NOTHING;
 	}
@@ -32,18 +32,14 @@ public class Game{
 		checkCondition();
 	}
 	public String getResult(){
-			if(result == WIN){
-				return "YOU WIN";
-			}
-			if(result == TIE){
-				return "IT'S A TIE";
-			}
-			if(result == LOSE){
-				return "YOU LOSE";
-			}
-			return "IDKKK";
+        switch(result){
+            case WIN: return "YOU WIN";
+            case LOSE: return "YOU LOSE";
+            case TIE: return "IT'S A TIE";
+            default: return "Undecided";
+        }
 	}
-	public void checkCondition(){
+	private void checkCondition(){
 		if(yourHand == theirHand) 
 			result = TIE;
 		if((yourHand == ROCK && theirHand == SCISSOR) || (yourHand == PAPER && theirHand == ROCK) ||(yourHand == SCISSOR && theirHand == PAPER))

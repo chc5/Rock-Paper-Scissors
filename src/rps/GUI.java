@@ -34,28 +34,28 @@ public class GUI implements Runnable{
 	private boolean inRestartMode = false;
 	private boolean waitingForOpponent = false;
 
-	public GUI(){
+	GUI(){
 		rps = new RPS();
 		loadImages();
 		initializingPainter();
 		initializingFrame();
 		initializingThread();
 	}
-	public void loadImages(){
+	private void loadImages(){
 		try {
 			paper = ImageIO.read(getClass().getResourceAsStream("/paper.png"));
 			rock = ImageIO.read(getClass().getResourceAsStream("/rock.png"));
 			scissors = ImageIO.read(getClass().getResourceAsStream("/scissors.png"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.err.println("Failed to read images.");
 			e.printStackTrace();
 		}
 	}
-	public void initializingPainter(){
+	private void initializingPainter(){
 		painter = new Painter();
 		painter.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 	}
-	public void initializingFrame(){
+	private void initializingFrame(){
 		frame = new JFrame();
 		frame.setTitle("Tic-Tac-Toe");
 		frame.setContentPane(painter);
@@ -65,13 +65,13 @@ public class GUI implements Runnable{
 		frame.setResizable(false);
 		frame.setVisible(true);
 	}
-	public void initializingThread(){
+	private void initializingThread(){
 		thread = new Thread(this, "TicTacToe");
 		thread.start();
 	}
 	private class Painter extends JPanel implements MouseListener{
 
-		public Painter(){
+		Painter(){
 			setFocusable(true);
 			requestFocus();
 			setBackground(Color.WHITE);
@@ -119,6 +119,7 @@ public class GUI implements Runnable{
 //			painter.validate();
 //			painter.repaint();
 		}
+
 		private void drawHandScreen(Graphics g) {
 			// TODO Auto-generated method stub
 			g.drawString("Pick your hand.",50,50);
@@ -174,7 +175,7 @@ public class GUI implements Runnable{
 
 		}
 	}
-	public void play(){
+	private void play(){
 		if(inRestartMode && waitingForOpponent){
 			rps.restart();
 			waitingForOpponent = false;
@@ -185,7 +186,6 @@ public class GUI implements Runnable{
 			rps.waitForTheirHand();
 			waitingForOpponent = false;
 			inRestartMode = true;
-			return;
 		}
 	}
 	@Override
@@ -201,6 +201,7 @@ public class GUI implements Runnable{
 			RPS.output.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			System.err.println("Failed to close the input and output streams.");
 			e.printStackTrace();
 		}
 		inRestartMode = false;

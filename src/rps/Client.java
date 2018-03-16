@@ -6,12 +6,12 @@ import java.net.Socket;
 import java.io.IOException;
 
 public class Client {
-	Socket socket;
+	private Socket socket;
 	final String name = "CLIENT";
 	//private GUI gui;
-	public Client(){
+	Client(){
 		
-	};
+	}
 	public void play(){
 		
 	}
@@ -22,7 +22,7 @@ public class Client {
 			RPS.input = new DataInputStream(socket.getInputStream());
 			System.out.println("The client has connected to the server.");
 		} catch(IOException e){
-			System.out.println("The client has not connected to the server.");
+			System.err.println("The client has not connected to the server.");
 			e.printStackTrace();
 			return false;
 		}
